@@ -1,0 +1,24 @@
+old_sound_rabbit_mq:
+    connections:
+        default:
+            host:     '%env(RABBIT_MQ_HOST)%'
+            port:     '%env(RABBIT_MQ_PORT)%'
+            user:     '%env(RABBIT_MQ_USER)%'
+            password: '%env(RABBIT_MQ_PASSWORD)%'
+            vhost:    '/'
+            lazy:     true
+            connection_timeout: 3
+            read_write_timeout: 3
+            keepalive: false
+            heartbeat: 0
+#    producers:
+#        # use 'old_sound_rabbit_mq.task_producer' service to send data.
+#        task:
+#            connection:       default
+#            exchange_options: { name: 'task', type: direct }
+#    consumers:
+#        task:
+#            connection:       default
+#            exchange_options: { name: 'task', type: direct }
+#            queue_options:    { name: 'task'}
+#            callback:         App\Consumer\TaskConsumer

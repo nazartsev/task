@@ -1,0 +1,61 @@
+version: "3"
+services:
+    php:
+        build: ./docker/php
+        container_name: task_php
+        restart: always
+        env_file:
+            - .env
+        volumes:
+            - ./app:/app:cached
+            - ./docker/php/php-ini-overrides.ini:/usr/local/etc/php/conf.d/99-overrides.ini
+        links:
+            - mysql:mysql
+            - rabbitmq:rabbitmq
+        networks:
+            - task
+
+    mysql:
+        image: 'mariadb'
+        restart: always
+        env_file:
+            - .env
+        environment:
+            - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
+            - MYSQL_DATABASE=${MYSQL_DATABASE}
+            - MYSQL_USER=${MYSQL_USER}
+            - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+        volumes:
+            - ./data/mysql:/var/lib/mysql
+        ports:
+            - 3306:3306
+        networks:
+            - task
+
+    nginx:
+        build: ./docker/nginx
+        restart: always
+        ports:
+            - 80:80
+        volumes:
+            - ./logs/nginx/:/var/log/nginx
+            - ./app:/app
+            - ./data/nginx:/etc/nginx/conf.d
+        depends_on:
+            - php
+        links:
+            - php
+        networks:
+            - task
+
+    rabbitmq:
+        image: rabbitmq:3-management-alpine
+        ports:
+            - 5672:5672
+            - 15672:15672
+        networks:
+            - task
+
+networks:
+    task:
+        driver: bridge

@@ -65,4 +65,19 @@ class NewsRepository extends ServiceEntityRepository
             ->getOneOrNullResult()
         ;
     }
+
+    public function findDirectById(int $id): ?News
+    {
+        $now = new DateTime();
+
+        return $this->createQueryBuilder('n')
+            ->andWhere('n.id = :id')
+            ->andWhere('(n.is_hidden = false and n.is_active = true) or (n.is_hidden = true and n.is_active = true)')
+            ->andWhere('n.published_at <= :time')
+            ->setParameter('time', $now->format('Y-m-d H:i:s'))
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
 }

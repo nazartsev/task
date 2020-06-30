@@ -25,3 +25,16 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    newsrepository:
+        class: Doctrine\ORM\EntityRepository
+        factory: ["@doctrine.orm.entity_manager", getRepository]
+        arguments:
+            - App\Entity\News
+    app.consumer.generate_sitemap:
+        class: App\Consumer\SitemapGenerationConsumer
+        arguments: ['@newsrepository', '@twig']
+    App\Command\GenerateSitemap:
+        tags:
+            - { name: 'console.command', command: 'app:sitemap-generate' }
+        arguments: ['@generate_sitemap_producer']
+    

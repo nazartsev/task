@@ -11,14 +11,15 @@ old_sound_rabbit_mq:
             read_write_timeout: 3
             keepalive: false
             heartbeat: 0
-#    producers:
-#        # use 'old_sound_rabbit_mq.task_producer' service to send data.
-#        task:
-#            connection:       default
-#            exchange_options: { name: 'task', type: direct }
-#    consumers:
-#        task:
-#            connection:       default
-#            exchange_options: { name: 'task', type: direct }
-#            queue_options:    { name: 'task'}
-#            callback:         App\Consumer\TaskConsumer
+    producers:
+        # use 'old_sound_rabbit_mq.task_producer' service to send data.
+        generate_sitemap:
+            connection:       default
+            exchange_options: { name: 'sitemap_task', type: direct }
+            service_alias: generate_sitemap_producer
+    consumers:
+        generate_sitemap:
+            connection:       default
+            exchange_options: { name: 'sitemap_task', type: direct }
+            queue_options:    { name: 'sitemap_task'}
+            callback:         app.consumer.generate_sitemap

@@ -21,30 +21,33 @@ class AdminController extends AbstractController
         $entityManager = $this->getDoctrine()->getManager();
 
         $now = new DateTime();
-
+        $content = $request->getContent();
+        $data = json_decode($content, true);
+        $publishedAt = DateTime::createFromFormat('Y-m-d H:i:s', $data['publishedAt']);
         try {
             $newsEntity = new News();
-            $newsEntity->setTitle($request->request->get('title'));
-            $newsEntity->setSlug($request->request->get('slug'));
-            $newsEntity->setDescription($request->request->get('description'));
-            $newsEntity->setShortDescription($request->request->get('shortDescription'));
+            $newsEntity->setTitle($data['title']);
+            $newsEntity->setSlug($data['slug']);
+            $newsEntity->setDescription($data['description']);
+            $newsEntity->setShortDescription($data['shortDescription']);
             $newsEntity->setCreatedAt($now);
             $newsEntity->setUpdatedAt($now);
-            $newsEntity->setPublishedAt($request->request->get('publishedAt'));
-            $newsEntity->setIsActive($request->request->get('isActive'));
-            $newsEntity->setIsHidden($request->request->get('isHidden'));
+            $newsEntity->setPublishedAt($publishedAt);
+            $newsEntity->setIsActive($data['isActive']);
+            $newsEntity->setIsHidden($data['isHidden']);
+            $newsEntity->setHits(0);
 
             $errors = $validator->validate($newsEntity);
             if (count($errors) > 0) {
-                return new JsonResponse(['errors' => (string) $errors], 400);
+                return $this->json(['errors' => (string) $errors], 400);
             }
 
             $entityManager->persist($newsEntity);
             $entityManager->flush();
 
-            $response = new JsonResponse(['id' => $newsEntity->getId()], 201);
+            $response = $this->json(['id' => $newsEntity->getId()], 201);
         } catch (Exception $e) {
-            $response = new JsonResponse(['errors' => $e->getMessage()], 400);
+            $response = $this->json(['errors' => $e->getMessage()], 400);
         }
 
         return $response;
@@ -58,32 +61,35 @@ class AdminController extends AbstractController
         $entityManager = $this->getDoctrine()->getManager();
 
         $now = new DateTime();
+        $content = $request->getContent();
+        $data = json_decode($content, true);
+        $publishedAt = DateTime::createFromFormat('Y-m-d H:i:s', $data['publishedAt']);
         try {
             $newsEntity = $this->getDoctrine()->getRepository(News::class)->find($id);
             if ($newsEntity) {
-                $newsEntity->setTitle($request->request->get('title'));
-                $newsEntity->setSlug($request->request->get('slug'));
-                $newsEntity->setDescription($request->request->get('description'));
-                $newsEntity->setShortDescription($request->request->get('shortDescription'));
+                $newsEntity->setTitle($data['title']);
+                $newsEntity->setSlug($data['slug']);
+                $newsEntity->setDescription($data['description']);
+                $newsEntity->setShortDescription($data['shortDescription']);
                 $newsEntity->setUpdatedAt($now);
-                $newsEntity->setPublishedAt($request->request->get('publishedAt'));
-                $newsEntity->setIsActive($request->request->get('isActive'));
-                $newsEntity->setIsHidden($request->request->get('isHidden'));
+                $newsEntity->setPublishedAt($publishedAt);
+                $newsEntity->setIsActive($data['isActive']);
+                $newsEntity->setIsHidden($data['isHidden']);
 
                 $errors = $validator->validate($newsEntity);
                 if (count($errors) > 0) {
-                    return new JsonResponse(['errors' => (string) $errors], 400);
+                    return $this->json(['errors' => (string) $errors], 400);
                 }
 
                 $entityManager->persist($newsEntity);
                 $entityManager->flush();
 
-                $response = new JsonResponse(['id' => $newsEntity->getId()], 200);
+                $response = $this->json(['id' => $newsEntity->getId()], 200);
             } else {
-                $response = new JsonResponse(null, 404);
+                $response = $this->json(null, 404);
             }
         } catch (Exception $e) {
-            $response = new JsonResponse(['errors' => $e->getMessage()], 400);
+            $response = $this->json(['errors' => $e->getMessage()], 400);
         }
 
         return $response;
@@ -101,9 +107,9 @@ class AdminController extends AbstractController
             $entityManager->remove($newsEntity);
             $entityManager->flush();
 
-            $response = new JsonResponse(null, 204);
+            $response = $this->json(null, 204);
         } else {
-            $response = new JsonResponse(null, 404);
+            $response = $this->json(null, 404);
         }
 
         return $response;

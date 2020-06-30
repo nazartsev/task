@@ -1,3 +1,6 @@
 #index:
 #    path: /
 #    controller: App\Controller\DefaultController::index
+
+presta_sitemap:
+  resource: "@PrestaSitemapBundle/Resources/config/routing.yml"

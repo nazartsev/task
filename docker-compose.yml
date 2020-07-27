@@ -2,11 +2,12 @@ version: "3"
 services:
     php:
         build: ./docker/php
-        container_name: task_php
+        container_name: php
         restart: always
         env_file:
             - .env
         volumes:
+            - ./app/src:/var/www
             - ./app:/app:cached
             - ./docker/php/php-ini-overrides.ini:/usr/local/etc/php/conf.d/99-overrides.ini
         links:

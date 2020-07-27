@@ -1,0 +1,3 @@
+@reboot php bin/console rabbitmq:declare
+
+*/1 *  *  *  *  /php bin/console rabbitmq:consume Sitemap --time 10

@@ -9,6 +9,10 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 
+use function dirname;
+
+use const PHP_VERSION_ID;
+
 class Kernel extends BaseKernel
 {
     use MicroKernelTrait;

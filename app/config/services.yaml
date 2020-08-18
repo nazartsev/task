@@ -4,7 +4,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
-
+    host: '%env(HOST)%'
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -22,6 +22,38 @@ services:
     App\Controller\:
         resource: '../src/Controller'
         tags: ['controller.service_arguments']
+
+    App\EventSubscriber\NewsSubscriber:
+        tags:
+            - { name: 'doctrine.event_subscriber' }
+
+    sitemap_service:
+        class: App\Consumer\SitemapConsumer
+
+
+old_sound_rabbit_mq:
+    connections:
+        default:
+            host: '%env(RABBIT_MQ_HOST)%'
+            user: '%env(RABBIT_MQ_USER)%'
+            password: '%env(RABBIT_MQ_PASSWORD)%'
+            connection_timeout: 1
+            read_write_timeout: 1
+
+    consumers:
+        sitemap:
+            connection: default
+            callback: sitemap_service
+            exchange_options: {name: 'sitemap', type: direct}
+            queue_options:    {name: 'sitemap'}
+    producers:
+        sitemap:
+            connection: default
+            exchange_options:
+                type: direct
+                name: 'sitemap'
+
+
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
